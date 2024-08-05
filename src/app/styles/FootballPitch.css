@@ -1,0 +1,109 @@
+.pitch {
+  position: relative;
+  width: 600px;
+  height: 400px;
+  background-color: green;
+  border: 2px solid white;
+  margin: 0 auto;
+}
+
+.halfway-line {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 100%;
+  background-color: white;
+  transform: translateX(-50%);
+}
+
+.center-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  background-color: transparent;
+  border: 2px solid white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.penalty-area {
+  position: absolute;
+  width: 100px;
+  height: 200px;
+  background-color: transparent;
+  border: 2px solid white;
+}
+
+.penalty-area-left {
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.penalty-area-right {
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+}
+
+.goal {
+  position: absolute;
+  width: 10px;
+  height: 50px;
+  background-color: white;
+}
+
+.goal-left {
+  top: 50%;
+  left: -10px;
+  transform: translateY(-50%);
+}
+
+.goal-right {
+  top: 50%;
+  right: -10px;
+  transform: translateY(-50%);
+}
+
+.player {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: red;
+  border-radius: 50%;
+}
+
+.player-left {
+  background-color: black;
+}
+
+.player-right {
+  background-color: blue;
+}
+
+.player-name {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.5);
+  color: black;
+  max-width: 70px;
+  height: 20px;
+  top: -25px; 
+  left: -20px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.football {
+  position: absolute;
+  background-image: url('/football.png'); 
+  background-size: cover; 
+  width: 20px; 
+  height: 20px; 
+  font-size: 20px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
