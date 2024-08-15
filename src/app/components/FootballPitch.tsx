@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../styles/FootballPitch.css";
 
 const FootballPitch: React.FC = () => {
   const initialPositions = [
     // Left side players
-    { id: "player-0", left: "10%", top: "10%", name: "Player 1", team: "home" },
+    { id: "player-0", left: "2%", top: "50%", name: "Player 1", team: "home" },
     { id: "player-1", left: "10%", top: "20%", name: "Player 2", team: "home" },
     { id: "player-2", left: "10%", top: "30%", name: "Player 3", team: "home" },
     { id: "player-3", left: "10%", top: "40%", name: "Player 4", team: "home" },
@@ -60,7 +60,7 @@ const FootballPitch: React.FC = () => {
     },
     {
       id: "player-15",
-      left: "80%",
+      left: "98%",
       top: "50%",
       name: "Player 16",
       team: "away",
@@ -114,12 +114,63 @@ const FootballPitch: React.FC = () => {
     left: "50%",
     top: "50%",
   });
+  const [homeFormation, setHomeFormation] = useState("");
+  const [awayFormation, setAwayFormation] = useState("");
+
+  useEffect(() => {
+    const calculateHomeFormation = (team: string) => {
+      const teamPlayers = playerPositions.filter(
+        (player) => player.team === team && player.left !== "2%"
+      );
+
+      const defenders = teamPlayers.filter(
+        (player) => parseFloat(player.left) <= 16
+      ).length;
+      const midfielders = teamPlayers.filter(
+        (player) =>
+          parseFloat(player.left) > 16 && parseFloat(player.left) <= 30
+      ).length;
+      const forwards = teamPlayers.filter(
+        (player) => parseFloat(player.left) > 30
+      ).length;
+
+      return `${defenders}-${midfielders}-${forwards}`;
+    };
+
+    const calculateAwayFormation = (team: string) => {
+      const teamPlayers = playerPositions.filter(
+        (player) => player.team === team && player.left !== "98%"
+      );
+
+      const defenders = teamPlayers.filter(
+        (player) => parseFloat(player.left) >= 84
+      ).length;
+      const midfielders = teamPlayers.filter(
+        (player) =>
+          parseFloat(player.left) > 68 && parseFloat(player.left) <= 84
+      ).length;
+      const forwards = teamPlayers.filter(
+        (player) =>
+          parseFloat(player.left) > 50 && parseFloat(player.left) <= 68
+      ).length;
+
+      return `${defenders}-${midfielders}-${forwards}`;
+    };
+
+    setHomeFormation(calculateHomeFormation("home"));
+    setAwayFormation(calculateAwayFormation("away"));
+  }, [playerPositions]);
 
   const handleDragStart = (
     event: React.DragEvent<HTMLDivElement>,
     id: string
   ) => {
     event.dataTransfer.setData("text/plain", id);
+    const rect = event.currentTarget.getBoundingClientRect();
+    const offsetX = event.clientX - rect.left;
+    const offsetY = event.clientY - rect.top;
+    event.dataTransfer.setData("offsetX", offsetX.toString());
+    event.dataTransfer.setData("offsetY", offsetY.toString());
   };
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
@@ -129,10 +180,19 @@ const FootballPitch: React.FC = () => {
     const offsetX = event.clientX - rect.left;
     const offsetY = event.clientY - rect.top;
 
+    const pitchWidth = rect.width;
+    const pitchHeight = rect.height;
+
+    const dragOffsetX = parseFloat(event.dataTransfer.getData("offsetX"));
+    const dragOffsetY = parseFloat(event.dataTransfer.getData("offsetY"));
+
+    const leftPercentage = ((offsetX - dragOffsetX) / pitchWidth) * 100;
+    const topPercentage = ((offsetY - dragOffsetY) / pitchHeight) * 100;
+
     if (id === "football") {
       setFootballPosition({
-        left: `${offsetX - 10}px`, // Adjusting for football element width
-        top: `${offsetY - 10}px`, // Adjusting for football element height
+        left: `${leftPercentage}%`,
+        top: `${topPercentage}%`,
       });
     } else {
       setPlayerPositions((prevPositions) =>
@@ -140,8 +200,8 @@ const FootballPitch: React.FC = () => {
           player.id === id
             ? {
                 ...player,
-                left: `${offsetX - 10}px`, // Adjusting for player element width
-                top: `${offsetY - 10}px`, // Adjusting for player element height
+                left: `${leftPercentage}%`,
+                top: `${topPercentage}%`,
               }
             : player
         )
@@ -171,7 +231,12 @@ const FootballPitch: React.FC = () => {
   };
 
   return (
-    <div className="pitch" onDrop={handleDrop} onDragOver={handleDragOver}>
+    <div
+      className="pitch"
+      role="presentation"
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+    >
       <div className="halfway-line"></div>
       <div className="center-circle"></div>
       <div className="penalty-area penalty-area-left"></div>
@@ -204,6 +269,8 @@ const FootballPitch: React.FC = () => {
         draggable
         onDragStart={(event) => handleDragStart(event, "football")}
       ></div>
+      <div className="formation home-formation">{homeFormation}</div>
+      <div className="formation away-formation">{awayFormation}</div>
     </div>
   );
 };
